@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("api/v1/customers")
+@RequestMapping("api/customers")
 public record CustomerController(CustomerRepository customerRepository) {
 
 
@@ -21,17 +21,17 @@ public record CustomerController(CustomerRepository customerRepository) {
         return "Welcome";
     }
 
-    @GetMapping("/customers/search/customername/{customername}")
+    @GetMapping("/search/customername/{customername}")
     private List<Customer> searchCustomersByCustomername(@PathVariable String customername) {
         return customerRepository.findByCustomername(customername);
     }
 
-    @GetMapping("/customers/search/birthDay/{birthDay}")
+    @GetMapping("/search/birthDay/{birthDay}")
     private List<Customer> searchCustomersBybirthDay(@PathVariable int birthDay) {
         return customerRepository.findByBirthDay(birthDay);
     }
 
-    @GetMapping("/customers/search/customernameBirthDay/{customername}/{birthDay}")
+    @GetMapping("/search/customernameBirthDay/{customername}/{birthDay}")
     private List<Customer> searchCustomersByCustomernameBirthDay(@PathVariable String customername, @PathVariable int birthDay) {
         List<Customer> customersFoundByCustomername = customerRepository.findByCustomername(customername);
         List<Customer> customersFoundByBirthDay = customerRepository.findByBirthDay(birthDay);
@@ -41,7 +41,7 @@ public record CustomerController(CustomerRepository customerRepository) {
         return intersection;
     }
 
-    @GetMapping("/customers/all")
+    @GetMapping("/all")
     private Iterable<Customer> getAllCustomersInformation() {
         return customerRepository.findAll();
 
@@ -52,7 +52,7 @@ public record CustomerController(CustomerRepository customerRepository) {
         return customerRepository.save(customer);
     }
 
-    @PutMapping("customers/update/{id}")
+    @PutMapping("update/{id}")
     private ResponseEntity<Customer> updateCustomer(@PathVariable String id, @RequestBody Customer customer) {
         Optional<Customer> existedCustomer = customerRepository.findById(id);
         if (existedCustomer.isPresent()) {
@@ -64,7 +64,7 @@ public record CustomerController(CustomerRepository customerRepository) {
         }
     }
 
-    @DeleteMapping("customers/delete/{id}")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable("id") String id) {
         Optional<Customer> existingCustomer = customerRepository.findById(id);
         if (existingCustomer.isPresent()) {

@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ContractRepository extends MongoRepository<Contract, String> {
 
-    // Additional custom methods can be defined here if needed
+    Contract getContractById(int id);
 
 }
