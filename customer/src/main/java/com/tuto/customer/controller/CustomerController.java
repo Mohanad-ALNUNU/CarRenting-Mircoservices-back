@@ -2,19 +2,30 @@ package com.tuto.customer.controller;
 
 import com.tuto.customer.entity.Customer;
 import com.tuto.customer.repository.CustomerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/customers")
-public record CustomerController(CustomerRepository customerRepository) {
+public class CustomerController{
 
+private final KafkaTemplate kafkaTemplate;
+private final CustomerRepository customerRepository;
 
-
+@Autowired
+public CustomerController(KafkaTemplate kafkaTemplate, CustomerRepository customerRepository){
+    this.kafkaTemplate = kafkaTemplate;
+    this.customerRepository = customerRepository;
+}
     @GetMapping("/")
     private String rootPage() {
 
@@ -48,9 +59,11 @@ public record CustomerController(CustomerRepository customerRepository) {
     }
 
     @PostMapping
-    private Customer addCustomer(@RequestBody Customer customer) {
-        return customerRepository.save(customer);
+    private ResponseEntity<String> createCustomer(@RequestBody Customer customer) {
+        kafkaTemplate.send("customer", customer);
+        return new ResponseEntity<>("Request sent to Kafka", HttpStatus.OK);
     }
+
 
     @PutMapping("update/{id}")
     private ResponseEntity<Customer> updateCustomer(@PathVariable String id, @RequestBody Customer customer) {

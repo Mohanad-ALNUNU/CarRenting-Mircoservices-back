@@ -11,6 +11,7 @@ import com.tuto.customer.entity.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,15 +24,18 @@ public class ContractController {
     private final ContractRepository contractRepository;
     private final VehicleRepository vehicleRepository;
     private final CustomerRepository customerRepository;
+
+    private final KafkaTemplate<String, Contract> kafkaTemplate;
     @Autowired
-    public ContractController(ContractRepository contractRepository, VehicleRepository vehicleRepository, CustomerRepository customerRepository) {
+    public ContractController(ContractRepository contractRepository, VehicleRepository vehicleRepository, CustomerRepository customerRepository, KafkaTemplate<String, Contract> kafkaTemplate) {
         this.contractRepository = contractRepository;
         this.vehicleRepository = vehicleRepository;
         this.customerRepository = customerRepository;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     @PostMapping
-    public ResponseEntity<Contract> createContract(@RequestBody ContractRequest contractRequest) {
+    public ResponseEntity<String> createContract(@RequestBody ContractRequest contractRequest) {
         // Retrieve the Vehicle and Customer entities based on the provided IDs
         Vehicle vehicle = vehicleRepository.findById(contractRequest.getVehicleId())
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found"));
@@ -39,15 +43,15 @@ public class ContractController {
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         // Create a new Contract object and set the Vehicle and Customer references
-        Contract contract = new Contract();
-        contract.setName(contractRequest.getName());
-        contract.setDescription(contractRequest.getDescription());
-        contract.setVehicle(vehicle);
-        contract.setCustomer(customer);
+        Contract contract = Contract.builder()
+                .name(contractRequest.getName())
+                .description(contractRequest.getDescription())
+                .vehicle(vehicle)
+                .customer(customer)
+                .build();
 
-        // Save the Contract entity
-        Contract savedContract = contractRepository.save(contract);
-        return new ResponseEntity<>(savedContract, HttpStatus.CREATED);
+        kafkaTemplate.send("contract",contract);
+        return new ResponseEntity<>("request sent by kafka", HttpStatus.CREATED);
     }
 
     @GetMapping("/all")

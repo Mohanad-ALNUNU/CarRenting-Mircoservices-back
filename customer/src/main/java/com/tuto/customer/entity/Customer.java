@@ -11,7 +11,7 @@ public class Customer {
     private String id;
     private String firstName;
     private String lastName;
-    private String customername;
+    private String customerName;
     private String password;
     private int birthDay;
     private PaymentMethod paymentMethod;

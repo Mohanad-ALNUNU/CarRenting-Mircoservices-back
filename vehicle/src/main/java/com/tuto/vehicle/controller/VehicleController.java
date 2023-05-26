@@ -2,9 +2,11 @@ package com.tuto.vehicle.controller;
 
 import com.tuto.vehicle.entity.Vehicle;
 import com.tuto.vehicle.repository.VehicleRepository;
+import com.tuto.vehicle.service.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,86 +16,51 @@ import java.util.Optional;
 @RequestMapping("/api/vehicles")
 public class VehicleController {
 
-    private final VehicleRepository vehicleRepository;
+    private final VehicleService vehicleService;
 
     @Autowired
-    public VehicleController(VehicleRepository vehicleRepository) {
-        this.vehicleRepository = vehicleRepository;
+    public VehicleController(VehicleService vehicleService) {
+
+        this.vehicleService = vehicleService;
     }
 
     @PostMapping
-    public ResponseEntity<Vehicle> createVehicle(@RequestBody Vehicle vehicle) {
-        Vehicle savedVehicle = vehicleRepository.save(vehicle);
-        return new ResponseEntity<>(savedVehicle, HttpStatus.CREATED);
+    public ResponseEntity<String> createVehicle(@RequestBody Vehicle vehicle) {
+            vehicleService.sendVehicleEntity(vehicle);
+        return new  ResponseEntity<>("Vehicle sent", HttpStatus.OK);
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<Vehicle>> getAllVehicles() {
-        List<Vehicle> vehicles = vehicleRepository.findAll();
-        return new ResponseEntity<>(vehicles, HttpStatus.OK);
+        return vehicleService.getAllVehicles();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Vehicle> getVehicleById(@PathVariable("id") String id) {
-        Optional<Vehicle> optionalVehicle = vehicleRepository.findById(id);
-        if (optionalVehicle.isPresent()) {
-            Vehicle vehicle = optionalVehicle.get();
-            return new ResponseEntity<>(vehicle, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return vehicleService.getVehicleById(id);
     }
 
     @GetMapping("/search/vehicleName/{name}")
     public ResponseEntity<List<Vehicle>> getVehicleByName(@PathVariable("name") String name) {
-        Optional<List<Vehicle>> optionalVehicleList = vehicleRepository.findByName(name);
-        if (optionalVehicleList.isPresent()) {
-            List<Vehicle> vehicleList = optionalVehicleList.get();
-            return new ResponseEntity<>(vehicleList, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return vehicleService.getVehicleByName(name);
     }
 
     @GetMapping("/search/vehicleModelDate/{modelDate}")
     public ResponseEntity<List<Vehicle>> getVehicleByModelDate(@PathVariable("modelDate") int modelDate) {
-        Optional<List<Vehicle>> optionalVehicleList = vehicleRepository.findByModelDate(modelDate);
-        if (optionalVehicleList.isPresent() && !optionalVehicleList.get().isEmpty()) {
-            List<Vehicle> vehicleList = optionalVehicleList.get();
-            return new ResponseEntity<>(vehicleList, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return vehicleService.getVehicleByModelDate(modelDate);
     }
-
     @GetMapping("/search/vehiclesNameModelDate/{name}/{modelDate}")
     public ResponseEntity<List<Vehicle>> getVehiclesByNameAndModelDate(@PathVariable("name") String name, @PathVariable("modelDate") int modelDate) {
-        Optional<List<Vehicle>> optionalVehicleList = vehicleRepository.findByNameAndModelDate(name, modelDate);
-        if (optionalVehicleList.isPresent() &&!optionalVehicleList.get().isEmpty()) {
-            List<Vehicle> vehicleList = optionalVehicleList.get();
-            return new ResponseEntity<>(vehicleList, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return vehicleService.getVehiclesByNameAndModelDate(name, modelDate);
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Vehicle> updateVehicle(@PathVariable("id") String id, @RequestBody Vehicle updatedVehicle) {
-        Optional<Vehicle> optionalVehicle = vehicleRepository.findById(id);
-        if (optionalVehicle.isPresent()) {
-            Vehicle existingVehicle = optionalVehicle.get();
-            existingVehicle.setName(updatedVehicle.getName());
-            existingVehicle.setModelDate(updatedVehicle.getModelDate());
-            existingVehicle.setVehicleType(updatedVehicle.getVehicleType());
-            Vehicle savedVehicle = vehicleRepository.save(existingVehicle);
-            return new ResponseEntity<>(savedVehicle, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return vehicleService.updateVehicle(id, updatedVehicle);
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteVehicle(@PathVariable("id") String id) {
-        Optional<Vehicle> optionalVehicle = vehicleRepository.findById(id);
-        if (optionalVehicle.isPresent()) {
-            vehicleRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return vehicleService.deleteVehicle(id);
     }
 }
