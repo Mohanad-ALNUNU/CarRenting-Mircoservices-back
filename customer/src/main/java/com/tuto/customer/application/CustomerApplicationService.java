@@ -1,72 +1,55 @@
-package com.tuto.customer.controller;
+package com.tuto.customer.application;
 
 import com.tuto.customer.entity.Customer;
 import com.tuto.customer.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Service;
 
-import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@RestController
-@RequestMapping("api/customers")
-public class CustomerController{
+@Service
+public class CustomerApplicationService {
 
-private final KafkaTemplate kafkaTemplate;
-private final CustomerRepository customerRepository;
+    private final KafkaTemplate<String, Customer> kafkaTemplate;
+    private final CustomerRepository customerRepository;
 
-@Autowired
-public CustomerController(KafkaTemplate kafkaTemplate, CustomerRepository customerRepository){
-    this.kafkaTemplate = kafkaTemplate;
-    this.customerRepository = customerRepository;
-}
-    @GetMapping("/")
-    private String rootPage() {
-
-        return "Welcome";
+    @Autowired
+    public CustomerApplicationService(KafkaTemplate<String, Customer> kafkaTemplate, CustomerRepository customerRepository) {
+        this.kafkaTemplate = kafkaTemplate;
+        this.customerRepository = customerRepository;
     }
 
-    @GetMapping("/search/customername/{customername}")
-    private List<Customer> searchCustomersByCustomername(@PathVariable String customername) {
+    public List<Customer> searchCustomersByCustomername(String customername) {
         return customerRepository.findByCustomername(customername);
     }
 
-    @GetMapping("/search/birthDay/{birthDay}")
-    private List<Customer> searchCustomersBybirthDay(@PathVariable int birthDay) {
+    public List<Customer> searchCustomersBybirthDay(int birthDay) {
         return customerRepository.findByBirthDay(birthDay);
     }
 
-    @GetMapping("/search/customernameBirthDay/{customername}/{birthDay}")
-    private List<Customer> searchCustomersByCustomernameBirthDay(@PathVariable String customername, @PathVariable int birthDay) {
+    public List<Customer> searchCustomersByCustomernameBirthDay(String customername, int birthDay) {
         List<Customer> customersFoundByCustomername = customerRepository.findByCustomername(customername);
         List<Customer> customersFoundByBirthDay = customerRepository.findByBirthDay(birthDay);
-        List<Customer> intersection = customersFoundByCustomername.stream()
+        return customersFoundByCustomername.stream()
                 .filter(customersFoundByBirthDay::contains)
                 .collect(Collectors.toList());
-        return intersection;
     }
 
-    @GetMapping("/all")
-    private Iterable<Customer> getAllCustomersInformation() {
+    public Iterable<Customer> getAllCustomersInformation() {
         return customerRepository.findAll();
-
     }
 
-    @PostMapping
-    private ResponseEntity<String> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<String> createCustomer(Customer customer) {
         kafkaTemplate.send("customer", customer);
         return new ResponseEntity<>("Request sent to Kafka", HttpStatus.OK);
     }
 
-
-    @PutMapping("update/{id}")
-    private ResponseEntity<Customer> updateCustomer(@PathVariable String id, @RequestBody Customer customer) {
+    public ResponseEntity<Customer> updateCustomer(String id, Customer customer) {
         Optional<Customer> existedCustomer = customerRepository.findById(id);
         if (existedCustomer.isPresent()) {
             customer.setId(id);
@@ -77,8 +60,7 @@ public CustomerController(KafkaTemplate kafkaTemplate, CustomerRepository custom
         }
     }
 
-    @DeleteMapping("delete/{id}")
-    public ResponseEntity<Void> deleteCustomer(@PathVariable("id") String id) {
+    public ResponseEntity<Void> deleteCustomer(String id) {
         Optional<Customer> existingCustomer = customerRepository.findById(id);
         if (existingCustomer.isPresent()) {
             customerRepository.deleteById(id);
