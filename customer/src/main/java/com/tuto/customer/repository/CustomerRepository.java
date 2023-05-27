@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface CustomerRepository extends CrudRepository<Customer, String> {
 
-    List<Customer> findByCustomername(String name);
+    List<Customer> findByCustomerName(String name);
     List<Customer> findByBirthDay(int birthday);
 
 }
