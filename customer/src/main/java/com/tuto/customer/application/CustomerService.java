@@ -5,9 +5,9 @@ import com.tuto.customer.entity.Customer;
 import java.util.List;
 
 public interface CustomerService {
-    List<Customer> findByCustomername(String customername);
+    List<Customer> findByCustomerName(String customerName);
     List<Customer> findByBirthDay(int birthDay);
-    List<Customer> findByCustomernameAndBirthDay(String customername, int birthDay);
+    List<Customer> findByCustomerNameAndBirthDay(String customerName, int birthDay);
     List<Customer> getAllCustomers();
     void createCustomer(Customer customer);
     void updateCustomer(String id, Customer customer);

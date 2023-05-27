@@ -3,6 +3,7 @@ package com.tuto.customer.service;
 import com.tuto.customer.application.CustomerService;
 import com.tuto.customer.entity.Customer;
 import com.tuto.customer.repository.CustomerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +24,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<Customer> findByCustomername(String customername) {
-        return customerRepository.findByCustomername(customername);
+    public List<Customer> findByCustomerName(String customerName) {
+        return customerRepository.findByCustomerName(customerName);
     }
 
     @Override
@@ -33,10 +34,10 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<Customer> findByCustomernameAndBirthDay(String customername, int birthDay) {
-        List<Customer> customersFoundByCustomername = customerRepository.findByCustomername(customername);
+    public List<Customer> findByCustomerNameAndBirthDay(String customerName, int birthDay) {
+        List<Customer> customersFoundByCustomerName = customerRepository.findByCustomerName(customerName);
         List<Customer> customersFoundByBirthDay = customerRepository.findByBirthDay(birthDay);
-        return customersFoundByCustomername.stream()
+        return customersFoundByCustomerName.stream()
                 .filter(customersFoundByBirthDay::contains)
                 .collect(Collectors.toList());
     }
