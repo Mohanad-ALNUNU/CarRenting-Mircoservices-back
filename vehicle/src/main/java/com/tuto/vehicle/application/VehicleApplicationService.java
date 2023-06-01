@@ -3,7 +3,6 @@ package com.tuto.vehicle.application;
 import com.tuto.vehicle.entity.Vehicle;
 import com.tuto.vehicle.service.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -19,35 +18,37 @@ public class VehicleApplicationService {
         this.vehicleService = vehicleService;
     }
 
-    public void createVehicle(Vehicle vehicle) {
-        vehicleService.sendVehicleEntity(vehicle);
+    public ResponseEntity<Void> createVehicle(Vehicle vehicle) {
+        vehicleService.createVehicle(vehicle);
+        return ResponseEntity.ok().build();
     }
 
     public ResponseEntity<List<Vehicle>> getAllVehicles() {
-        return vehicleService.getAllVehicles();
+        return ResponseEntity.ok(vehicleService.getAllVehicles());
     }
 
     public ResponseEntity<Vehicle> getVehicleById(String id) {
-        return vehicleService.getVehicleById(id);
+        return ResponseEntity.ok(vehicleService.getVehicleById(id));
     }
 
     public ResponseEntity<List<Vehicle>> getVehicleByName(String name) {
-        return vehicleService.getVehicleByName(name);
+        return ResponseEntity.ok(vehicleService.getVehicleByName(name));
     }
 
     public ResponseEntity<List<Vehicle>> getVehicleByModelDate(int modelDate) {
-        return vehicleService.getVehicleByModelDate(modelDate);
+        return ResponseEntity.ok(vehicleService.getVehicleByModelDate(modelDate));
     }
 
     public ResponseEntity<List<Vehicle>> getVehiclesByNameAndModelDate(String name, int modelDate) {
-        return vehicleService.getVehiclesByNameAndModelDate(name, modelDate);
+        return ResponseEntity.ok(vehicleService.getVehiclesByNameAndModelDate(name, modelDate));
     }
 
     public ResponseEntity<Vehicle> updateVehicle(String id, Vehicle updatedVehicle) {
-        return vehicleService.updateVehicle(id, updatedVehicle);
+        return ResponseEntity.ok(vehicleService.updateVehicle(id, updatedVehicle));
     }
 
     public ResponseEntity<Void> deleteVehicle(String id) {
-        return vehicleService.deleteVehicle(id);
+        vehicleService.deleteVehicle(id);
+        return ResponseEntity.ok().build();
     }
 }

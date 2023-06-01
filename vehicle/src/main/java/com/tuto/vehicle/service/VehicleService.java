@@ -1,6 +1,8 @@
     package com.tuto.vehicle.service;
 
+    import com.tuto.vehicle.application.VehicleServiceOperations;
     import com.tuto.vehicle.entity.Vehicle;
+    import com.tuto.vehicle.exception.VehicleNotFoundException;
     import com.tuto.vehicle.repository.VehicleRepository;
     import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.http.HttpStatus;
@@ -12,7 +14,7 @@
     import java.util.Optional;
 
     @Service
-    public class VehicleService {
+    public class VehicleService implements VehicleServiceOperations {
 
         private final KafkaTemplate<String, Vehicle> kafkaTemplate;
         private  final VehicleRepository vehicleRepository;
@@ -23,72 +25,42 @@
             this.vehicleRepository = vehicleRepository;
         }
 
-        public void sendVehicleEntity(Vehicle vehicle){
-            kafkaTemplate.send("vehicle", vehicle);
-        }
-
-    public ResponseEntity<List<Vehicle>> getAllVehicles(){
-        List<Vehicle> allVehicles = vehicleRepository.findAll();
-        if(allVehicles.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(allVehicles, HttpStatus.OK);
+    @Override
+    public void createVehicle(Vehicle vehicle){
+        kafkaTemplate.send("vehicle", vehicle);
     }
 
-    public ResponseEntity<Vehicle> getVehicleById(String id) {
-        Optional<Vehicle> optionalVehicle = vehicleRepository.findById(id);
-        if (optionalVehicle.isPresent()) {
-            Vehicle vehicle = optionalVehicle.get();
-            return new ResponseEntity<>(vehicle, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @Override
+    public List<Vehicle> getAllVehicles(){
+        return vehicleRepository.findAll();
+    }
+
+    @Override
+    public Vehicle getVehicleById(String id) {
+        return vehicleRepository.findById(id).orElseThrow(() -> new VehicleNotFoundException("No vehicle found with this ID"));
     }
 
 
-    public ResponseEntity<List<Vehicle>> getVehicleByName(String name) {
-        Optional<List<Vehicle>> optionalVehicleList = vehicleRepository.findByName(name);
-        if (optionalVehicleList.isPresent()) {
-            List<Vehicle> vehicleList = optionalVehicleList.get();
-            return new ResponseEntity<>(vehicleList, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @Override
+    public List<Vehicle> getVehicleByName(String name) {
+        return vehicleRepository.findByName(name);
     }
 
-    public ResponseEntity<List<Vehicle>> getVehicleByModelDate(int modelDate) {
-        Optional<List<Vehicle>> optionalVehicleList = vehicleRepository.findByModelDate(modelDate);
-        if (optionalVehicleList.isPresent() && !optionalVehicleList.get().isEmpty()) {
-            List<Vehicle> vehicleList = optionalVehicleList.get();
-            return new ResponseEntity<>(vehicleList, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @Override
+    public List<Vehicle> getVehicleByModelDate(int modelDate) {
+        return vehicleRepository.findByModelDate(modelDate);
     }
-    public ResponseEntity<List<Vehicle>> getVehiclesByNameAndModelDate(String name, int modelDate) {
-        Optional<List<Vehicle>> optionalVehicleList = vehicleRepository.findByNameAndModelDate(name, modelDate);
-        if (optionalVehicleList.isPresent() &&!optionalVehicleList.get().isEmpty()) {
-            List<Vehicle> vehicleList = optionalVehicleList.get();
-            return new ResponseEntity<>(vehicleList, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @Override
+    public List<Vehicle> getVehiclesByNameAndModelDate(String name, int modelDate) {
+        return vehicleRepository.findByNameAndModelDate(name, modelDate);
     }
 
-    public ResponseEntity<Vehicle> updateVehicle(String id,Vehicle updatedVehicle) {
-        Optional<Vehicle> optionalVehicle = vehicleRepository.findById(id);
-        if (optionalVehicle.isPresent()) {
-            Vehicle existingVehicle = optionalVehicle.get();
-            existingVehicle.setName(updatedVehicle.getName());
-            existingVehicle.setModelDate(updatedVehicle.getModelDate());
-            existingVehicle.setVehicleType(updatedVehicle.getVehicleType());
-            Vehicle savedVehicle = vehicleRepository.save(existingVehicle);
-            return new ResponseEntity<>(savedVehicle, HttpStatus.OK);
-            }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @Override
+    public Vehicle updateVehicle(String id,Vehicle updatedVehicle) {
+        return vehicleRepository.findById(id).orElseThrow(() -> new VehicleNotFoundException("No vehicle found with this ID"));
     }
-    public ResponseEntity<Void> deleteVehicle(String id) {
-        Optional<Vehicle> optionalVehicle = vehicleRepository.findById(id);
-        if (optionalVehicle.isPresent()) {
-            vehicleRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @Override
+    public void deleteVehicle(String id) {
+        vehicleRepository.findById(id);
     }
 }
