@@ -1,6 +1,7 @@
 package com.tuto.customer.application;
 
 import com.tuto.customer.entity.Customer;
+import com.tuto.customer.exceptions.CustomerCreationException;
 import com.tuto.customer.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,11 +22,12 @@ private final CustomerService customerService;
         this.customerService =customerService;
     }
 
+
     public List<Customer> searchCustomersByCustomerName(String customerName) {
         return customerService.findByCustomerName(customerName);
     }
 
-    public List<Customer> searchCustomersBybirthDay(int birthDay) {
+    public List<Customer> searchCustomersByBirthDay(int birthDay) {
         return customerService.findByBirthDay(birthDay);
     }
 
@@ -37,12 +39,11 @@ private final CustomerService customerService;
         return customerService.getAllCustomers();
     }
 
-    public ResponseEntity<String> createCustomer(Customer customer) {
-        customerService.createCustomer(customer);
-        return new ResponseEntity<>("Request sent to Kafka", HttpStatus.OK);
+    public void createCustomer(Customer customer) throws CustomerCreationException {
+            customerService.createCustomer(customer);
     }
 
-    public void updateCustomer(String id, Customer customer) {
+    public void updateCustomer(String id, Customer customer) throws CustomerCreationException{
        customerService.updateCustomer(id, customer);
     }
 

@@ -1,19 +1,18 @@
 package com.tuto.vehicle.controller;
 
 import com.tuto.vehicle.entity.Vehicle;
-import com.tuto.vehicle.repository.VehicleRepository;
 import com.tuto.vehicle.application.VehicleApplicationService;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/vehicles")
+@Api(tags = "Vehicle APIs")
 public class VehicleController {
 
     private final VehicleApplicationService vehicleApplicationService;
