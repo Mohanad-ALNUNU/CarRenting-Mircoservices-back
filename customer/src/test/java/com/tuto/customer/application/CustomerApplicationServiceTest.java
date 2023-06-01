@@ -30,8 +30,7 @@ class CustomerApplicationServiceTest {
     @InjectMocks
     private CustomerServiceImpl customerService1;
         @Test
-        @SneakyThrows
-        void Should_Not_ThrowError_When_AgeLessThan18() {
+        void Should_Not_ThrowError_When_AgeMoreThan18() {
             int currentYear = Calendar.getInstance().get(Calendar.YEAR);
             Customer customer1 = new Customer();
             customer1.setBirthDay(currentYear - 19);

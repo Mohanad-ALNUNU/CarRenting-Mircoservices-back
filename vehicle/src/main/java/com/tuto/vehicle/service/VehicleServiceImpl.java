@@ -2,32 +2,42 @@
 
     import com.tuto.vehicle.application.VehicleServiceOperations;
     import com.tuto.vehicle.entity.Vehicle;
+    import com.tuto.vehicle.exception.VehicleModelException;
     import com.tuto.vehicle.exception.VehicleNotFoundException;
     import com.tuto.vehicle.repository.VehicleRepository;
     import org.springframework.beans.factory.annotation.Autowired;
-    import org.springframework.http.HttpStatus;
-    import org.springframework.http.ResponseEntity;
     import org.springframework.kafka.core.KafkaTemplate;
     import org.springframework.stereotype.Service;
 
     import java.util.List;
-    import java.util.Optional;
 
     @Service
-    public class VehicleService implements VehicleServiceOperations {
+    public class VehicleServiceImpl implements VehicleServiceOperations {
 
         private final KafkaTemplate<String, Vehicle> kafkaTemplate;
         private  final VehicleRepository vehicleRepository;
 
         @Autowired
-        public VehicleService(KafkaTemplate<String, Vehicle> kafkaTemplate, VehicleRepository vehicleRepository){
+        public VehicleServiceImpl(KafkaTemplate<String, Vehicle> kafkaTemplate, VehicleRepository vehicleRepository){
             this.kafkaTemplate = kafkaTemplate;
             this.vehicleRepository = vehicleRepository;
         }
 
     @Override
-    public void createVehicle(Vehicle vehicle){
-        kafkaTemplate.send("vehicle", vehicle);
+    public void createVehicle(Vehicle vehicle) throws VehicleModelException{
+        if(vehicle.getModelDate() > 2005){
+            kafkaTemplate.send("vehicle", vehicle);
+        }else{
+            throw new VehicleModelException("couldn't update Vehicle have model less than 2005");
+        }
+    }
+
+    @Override
+    public Vehicle updateVehicle(String id,Vehicle updatedVehicle) throws VehicleModelException, VehicleNotFoundException {
+            vehicleRepository.findById(id).orElseThrow(() -> new VehicleNotFoundException("No vehicle found with this ID"));
+            updatedVehicle.setId(id);
+            createVehicle(updatedVehicle);
+            return updatedVehicle;
     }
 
     @Override
@@ -55,10 +65,6 @@
         return vehicleRepository.findByNameAndModelDate(name, modelDate);
     }
 
-    @Override
-    public Vehicle updateVehicle(String id,Vehicle updatedVehicle) {
-        return vehicleRepository.findById(id).orElseThrow(() -> new VehicleNotFoundException("No vehicle found with this ID"));
-    }
     @Override
     public void deleteVehicle(String id) {
         vehicleRepository.findById(id);
