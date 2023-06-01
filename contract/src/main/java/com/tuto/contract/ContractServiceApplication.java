@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan({"com.tuto.contract.controller","com.tuto.vehicle", "com.tuto.customer"})
+@ComponentScan({"com.tuto.contract","com.tuto.vehicle", "com.tuto.customer"})
 public class ContractServiceApplication {
 
     public static void main(String[] args) {
