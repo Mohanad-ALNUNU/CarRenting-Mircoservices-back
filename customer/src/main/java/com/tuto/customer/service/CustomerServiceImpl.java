@@ -2,11 +2,14 @@ package com.tuto.customer.service;
 
 import com.tuto.customer.application.CustomerService;
 import com.tuto.customer.entity.Customer;
+import com.tuto.customer.exceptions.CustomerCreationException;
 import com.tuto.customer.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -48,17 +51,23 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void createCustomer(Customer customer) {
-        kafkaTemplate.send("customer", customer);
+    public void createCustomer(Customer customer) throws CustomerCreationException {
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        boolean isOlderThen18 = currentYear - customer.getBirthDay() > 18;
+        if(isOlderThen18){
+            kafkaTemplate.send("customer", customer);
+        }else {
+            throw new CustomerCreationException("Customer is less than 18 year");
+        }
     }
 
     @Override
-    public void updateCustomer(String id, Customer customer) {
+    public void updateCustomer(String id, Customer customer) throws CustomerCreationException {
         Optional<Customer> existedCustomer = customerRepository.findById(id);
-        existedCustomer.ifPresent(existing -> {
+        if (existedCustomer.isPresent()) {
             customer.setId(id);
-            customerRepository.save(customer);
-        });
+            createCustomer(customer);
+        }
     }
 
     @Override

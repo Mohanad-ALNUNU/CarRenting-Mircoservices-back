@@ -3,6 +3,7 @@ package com.tuto.contract.controller;
 import com.tuto.contract.entity.Contract;
 import com.tuto.contract.entity.ContractRequest;
 import com.tuto.contract.applicaion.ContractService;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/contracts")
+@Api(tags = "Contract APIs")
 public class ContractController {
 
     private final ContractService contractService;
