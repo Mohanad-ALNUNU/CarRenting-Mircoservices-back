@@ -10,8 +10,8 @@ import java.util.Optional;
 @Repository
 public interface VehicleRepository extends MongoRepository<Vehicle, String> {
     Optional<Vehicle> findById(String id);
-    Optional<List<Vehicle>> findByModelDate(int modelDate);
-    Optional<List<Vehicle>> findByName(String name);
+    List<Vehicle> findByModelDate(int modelDate);
+    List<Vehicle> findByName(String name);
 
-    Optional<List<Vehicle>> findByNameAndModelDate(String name, int modelDate);
+    List<Vehicle> findByNameAndModelDate(String name, int modelDate);
 }

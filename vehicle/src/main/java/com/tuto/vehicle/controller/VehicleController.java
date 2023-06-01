@@ -2,6 +2,8 @@ package com.tuto.vehicle.controller;
 
 import com.tuto.vehicle.entity.Vehicle;
 import com.tuto.vehicle.application.VehicleApplicationService;
+import com.tuto.vehicle.exception.VehicleModelException;
+import com.tuto.vehicle.exception.VehicleNotFoundException;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +26,7 @@ public class VehicleController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createVehicle(@RequestBody Vehicle vehicle) {
+    public ResponseEntity<String> createVehicle(@RequestBody Vehicle vehicle) throws VehicleModelException {
             vehicleApplicationService.createVehicle(vehicle);
         return new  ResponseEntity<>("Vehicle sent", HttpStatus.OK);
     }
@@ -54,7 +56,7 @@ public class VehicleController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Vehicle> updateVehicle(@PathVariable("id") String id, @RequestBody Vehicle updatedVehicle) {
+    public ResponseEntity<Vehicle> updateVehicle(@PathVariable("id") String id, @RequestBody Vehicle updatedVehicle) throws VehicleModelException, VehicleNotFoundException {
         return vehicleApplicationService.updateVehicle(id, updatedVehicle);
     }
 
