@@ -10,8 +10,6 @@ import com.tuto.vehicle.repository.VehicleRepository;
 import com.tuto.vehicle.entity.Vehicle;
 import com.tuto.customer.entity.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -36,14 +34,12 @@ public class ContractServiceImpl implements ContractService {
     }
 
     @Override
-    public ResponseEntity<String> createContract(ContractRequest contractRequest) {
+    public void createContract(ContractRequest contractRequest) {
         Contract contract = buildContract(contractRequest);
-
         kafkaTemplate.send("contract", contract);
-        return new ResponseEntity<>("Request sent by Kafka", HttpStatus.CREATED);
     }
 
-    private Contract buildContract(ContractRequest contractRequest) {
+    private Contract buildContract(ContractRequest contractRequest) throws ResourceNotFoundException {
         Vehicle vehicle = vehicleRepository.findById(contractRequest.getVehicleId())
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found"));
         Customer customer = customerRepository.findById(contractRequest.getCustomerId())
@@ -54,48 +50,47 @@ public class ContractServiceImpl implements ContractService {
                 .description(contractRequest.getDescription())
                 .vehicle(vehicle)
                 .customer(customer)
+                .contractCreationDate(contractRequest.getContractCreationDate())
+                .contractBeginDate(contractRequest.getContractBeginDate())
+                .contractEndDate(contractRequest.getContractEndDate())
+                .confirmed(contractRequest.isConfirmed())
                 .build();
     }
 
     @Override
-    public ResponseEntity<List<Contract>> getAllContracts() {
-        List<Contract> contracts = contractRepository.findAll();
-        return new ResponseEntity<>(contracts, HttpStatus.OK);
+    public List<Contract> getAllContracts() {
+        return contractRepository.findAll();
     }
 
     @Override
-    public ResponseEntity<Contract> getContractById(String id) {
+    public Contract getContractById(String id) throws ResourceNotFoundException {
         Optional<Contract> optionalContract = contractRepository.findById(id);
         if (optionalContract.isPresent()) {
-            Contract contract = optionalContract.get();
-            return new ResponseEntity<>(contract, HttpStatus.OK);
+            return optionalContract.get();
+        }else {
+            throw new ResourceNotFoundException("No contract found with this ID");
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
     }
 
     @Override
-    public ResponseEntity<Contract> updateContract(String id, Contract updatedContract) {
+    public void updateContract(String id, Contract updatedContract) throws ResourceNotFoundException{
         Optional<Contract> optionalContract = contractRepository.findById(id);
         if (optionalContract.isPresent()) {
             Contract existingContract = optionalContract.get();
-            existingContract.setName(updatedContract.getName());
-            existingContract.setDescription(updatedContract.getDescription());
-            existingContract.setCustomer(updatedContract.getCustomer());
-            existingContract.setVehicle(updatedContract.getVehicle());
-
-            Contract savedContract = contractRepository.save(existingContract);
-            return new ResponseEntity<>(savedContract, HttpStatus.OK);
+            updatedContract.setId(existingContract.getId());
+            //TODO :: use kafka instead (By making id null and send it)
+            contractRepository.save(updatedContract);
+        }else {
+            throw new ResourceNotFoundException("No contract found with this ID");
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @Override
-    public ResponseEntity<Void> deleteContract(String id) {
+    public void deleteContract(String id) {
         Optional<Contract> optionalContract = contractRepository.findById(id);
         if (optionalContract.isPresent()) {
             contractRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

@@ -24,6 +24,10 @@ public class Contract {
     private String id;
     private String name;
     private String description;
+    private long contractCreationDate;
+    private long contractBeginDate;
+    private long contractEndDate;
+    private boolean confirmed;
     @DBRef
     private Vehicle vehicle;
     @DBRef
