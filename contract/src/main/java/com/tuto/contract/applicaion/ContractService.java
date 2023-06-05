@@ -8,13 +8,13 @@ import java.util.List;
 
 public interface ContractService {
 
-    ResponseEntity<String> createContract(ContractRequest contractRequest);
+    void createContract(ContractRequest contractRequest);
 
-    ResponseEntity<List<Contract>> getAllContracts();
+    void updateContract(String id, Contract updatedContract);
 
-    ResponseEntity<Contract> getContractById(String id);
+    List<Contract> getAllContracts();
 
-    ResponseEntity<Contract> updateContract(String id, Contract updatedContract);
+    Contract getContractById(String id);
 
-    ResponseEntity<Void> deleteContract(String id);
+    void deleteContract(String id);
 }

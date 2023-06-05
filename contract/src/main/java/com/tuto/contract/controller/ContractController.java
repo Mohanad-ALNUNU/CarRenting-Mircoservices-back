@@ -24,26 +24,27 @@ public class ContractController {
 
     @PostMapping
     public ResponseEntity<String> createContract(@RequestBody ContractRequest contractRequest) {
-        return contractService.createContract(contractRequest);
+        contractService.createContract(contractRequest);
+        return ResponseEntity.ok("Contract sent");
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Contract>> getAllContracts() {
+    public List<Contract> getAllContracts() {
         return contractService.getAllContracts();
     }
 
     @GetMapping("/search/id/{id}")
-    public ResponseEntity<Contract> getContractById(@PathVariable("id") String id) {
+    public Contract getContractById(@PathVariable("id") String id) {
         return contractService.getContractById(id);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Contract> updateContract(@PathVariable("id") String id, @RequestBody Contract updatedContract) {
-        return contractService.updateContract(id, updatedContract);
+    public void updateContract(@PathVariable("id") String id, @RequestBody Contract updatedContract) {
+        contractService.updateContract(id, updatedContract);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteContract(@PathVariable("id") String id) {
-        return contractService.deleteContract(id);
+    public void deleteContract(@PathVariable("id") String id) {
+        contractService.deleteContract(id);
     }
 }
