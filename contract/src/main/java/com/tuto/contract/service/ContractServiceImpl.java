@@ -3,6 +3,7 @@ package com.tuto.contract.service;
 import com.tuto.contract.applicaion.ContractService;
 import com.tuto.contract.entity.Contract;
 import com.tuto.contract.entity.ContractRequest;
+import com.tuto.contract.exception.ContractDatesException;
 import com.tuto.contract.exception.ResourceNotFoundException;
 import com.tuto.contract.repository.ContractRepository;
 import com.tuto.customer.repository.CustomerRepository;
@@ -34,9 +35,14 @@ public class ContractServiceImpl implements ContractService {
     }
 
     @Override
-    public void createContract(ContractRequest contractRequest) {
+    public void createContract(ContractRequest contractRequest) throws ContractDatesException, ResourceNotFoundException{
         Contract contract = buildContract(contractRequest);
-        kafkaTemplate.send("contract", contract);
+        boolean isBeginBeforeEnd = contractRequest.getContractBeginTimeStamp() < contractRequest.getContractEndTimeStamp();
+        if(isBeginBeforeEnd) {
+            kafkaTemplate.send("contract", contract);
+        }else{
+            throw new ContractDatesException("Begin Date must be before Ends Date");
+        }
     }
 
     private Contract buildContract(ContractRequest contractRequest) throws ResourceNotFoundException {
@@ -50,9 +56,9 @@ public class ContractServiceImpl implements ContractService {
                 .description(contractRequest.getDescription())
                 .vehicle(vehicle)
                 .customer(customer)
-                .contractCreationDate(contractRequest.getContractCreationDate())
-                .contractBeginDate(contractRequest.getContractBeginDate())
-                .contractEndDate(contractRequest.getContractEndDate())
+                .contractCreationTimeStamp(contractRequest.getContractCreationTimeStamp())
+                .contractBeginTimeStamp(contractRequest.getContractBeginTimeStamp())
+                .contractEndTimeStamp(contractRequest.getContractEndTimeStamp())
                 .confirmed(contractRequest.isConfirmed())
                 .build();
     }
