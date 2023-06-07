@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class ContractRequest {
     private String name;
     private String description;
+    private String imageURL;
     private long contractCreationTimeStamp;
     private long contractBeginTimeStamp;
     private long contractEndTimeStamp;

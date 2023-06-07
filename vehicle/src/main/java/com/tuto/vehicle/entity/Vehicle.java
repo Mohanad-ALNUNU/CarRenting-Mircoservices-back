@@ -11,14 +11,11 @@ public class Vehicle {
 
     @Id
     private String id;
-
     private String name;
-
+    private String imageURL;
     @Field("model_date")
     private int modelDate;
-
     private VehicleType vehicleType;
-
     public enum VehicleType {
         JEEP,
         SPORT,
