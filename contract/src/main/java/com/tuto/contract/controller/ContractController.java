@@ -3,6 +3,7 @@ package com.tuto.contract.controller;
 import com.tuto.contract.entity.Contract;
 import com.tuto.contract.entity.ContractRequest;
 import com.tuto.contract.applicaion.ContractService;
+import com.tuto.contract.exception.ContractDatesException;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,9 @@ public class ContractController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createContract(@RequestBody ContractRequest contractRequest) {
-        contractService.createContract(contractRequest);
+    public ResponseEntity<String> createContract(@RequestBody ContractRequest contractRequest) throws ContractDatesException {
+             contractService.createContract(contractRequest);
+
         return ResponseEntity.ok("Contract sent");
     }
 
@@ -42,6 +44,7 @@ public class ContractController {
     public void updateContract(@PathVariable("id") String id, @RequestBody Contract updatedContract) {
         contractService.updateContract(id, updatedContract);
     }
+
 
     @DeleteMapping("/{id}")
     public void deleteContract(@PathVariable("id") String id) {
