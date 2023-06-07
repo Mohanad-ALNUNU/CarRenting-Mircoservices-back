@@ -14,6 +14,7 @@ public class Customer {
     private String firstName;
     private String lastName;
     private String customerName;
+    private String imageURL;
     private String password;
     private int birthDay;
     private PaymentMethod paymentMethod;
