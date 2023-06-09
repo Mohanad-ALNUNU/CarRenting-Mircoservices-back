@@ -6,8 +6,10 @@ import org.springframework.http.ResponseEntity;
 
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.Optional;
 
 public interface CustomerService {
+    Optional<Customer> findByCustomerID(String id);
     List<Customer> findByCustomerName(String customerName);
     List<Customer> findByBirthDay(int birthDay);
     List<Customer> findByCustomerNameAndBirthDay(String customerName, int birthDay);

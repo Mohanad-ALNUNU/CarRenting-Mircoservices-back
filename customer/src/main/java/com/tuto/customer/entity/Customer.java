@@ -23,7 +23,8 @@ public class Customer {
         CREDIT_CARD,
         DEBIT_CARD,
         PAYPAL,
-        APPLE_PAY
+        APPLE_PAY,
+        CASH
     }
 
     //TODO::create private propriety (instance) of payment method from microservice payments
