@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import java.util.HashMap;
@@ -29,6 +30,7 @@ public class DatabaseServiceServiceApplication {
     public ConcurrentKafkaListenerContainerFactory<String, Contract> contractKafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, Contract> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(contractConsumerFactory());
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
         return factory;
     }
 
@@ -36,6 +38,7 @@ public class DatabaseServiceServiceApplication {
     public ConcurrentKafkaListenerContainerFactory<String, Customer> customerKafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, Customer> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(customerConsumerFactory());
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
         return factory;
     }
 
@@ -43,6 +46,7 @@ public class DatabaseServiceServiceApplication {
     public ConcurrentKafkaListenerContainerFactory<String, Vehicle> vehicleKafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, Vehicle> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(vehicleConsumerFactory());
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
         return factory;
     }
 
