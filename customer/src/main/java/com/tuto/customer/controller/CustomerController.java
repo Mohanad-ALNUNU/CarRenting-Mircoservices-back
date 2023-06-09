@@ -2,18 +2,15 @@ package com.tuto.customer.controller;
 
 import com.tuto.customer.entity.Customer;
 import com.tuto.customer.exceptions.CustomerCreationException;
-import com.tuto.customer.repository.CustomerRepository;
 import com.tuto.customer.application.CustomerApplicationService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -48,6 +45,11 @@ public class CustomerController {
     @GetMapping("/search/customernameBirthDay/{customername}/{birthDay}")
     public Iterable<Customer> searchCustomersByCustomernameBirthDay(@PathVariable String customername, @PathVariable int birthDay) {
         return customerApplicationService.searchCustomersByCustomerNameBirthDay(customername, birthDay);
+    }
+
+    @GetMapping("/search/customerID/{id}")
+    public Optional<Customer> searchCustomersByCustomerID(@PathVariable String id) {
+        return customerApplicationService.searchCustomersByID(id);
     }
 
     @GetMapping("/all")

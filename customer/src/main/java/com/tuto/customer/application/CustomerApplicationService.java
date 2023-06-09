@@ -22,6 +22,9 @@ private final CustomerService customerService;
         this.customerService =customerService;
     }
 
+    public Optional<Customer> searchCustomersByID(String id){
+        return customerService.findByCustomerID(id);
+    }
 
     public List<Customer> searchCustomersByCustomerName(String customerName) {
         return customerService.findByCustomerName(customerName);
